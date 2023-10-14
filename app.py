@@ -48,7 +48,7 @@ with st.sidebar:
 
 #streamlit run app.py
 def main(league_list):
-    st.header("View Predictions")
+    st.header("View Analytical Predictions")
 
     if 'stage' not in st.session_state:
         st.session_state.stage = 0
