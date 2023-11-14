@@ -22,7 +22,7 @@ def get_leagues():
     cursor = connection.cursor()
 
     #Create the table in the database
-    get_query = f"SELECT date, league FROM match_prediction"
+    get_query = f"SELECT date, league, cond_check FROM rules_check"
     cursor.execute(get_query)
 
     rows = cursor.fetchall()
@@ -31,12 +31,13 @@ def get_leagues():
     connection.close()
 
     #Converting the data extracted to a DataFrame for analysis
-    df = pd.DataFrame(rows, columns=['date', 'league'])
+    df = pd.DataFrame(rows, columns=['date', 'league', 'cond_check'])
     df['date'] = pd.to_datetime(df['date'], format="%Y-%m-%d %H:%M:%S")
 
     yesterday = date.today() + timedelta(days=-1)
     today = date.today()
     tomorrow = date.today() + timedelta(days=1)
+    df = df[df['cond_check'] == 'True']
     today_df = df[(df['date'].dt.date == yesterday) | (df['date'].dt.date == today) | (df['date'].dt.date == tomorrow)]
     leagues = tuple(set(list(today_df['league'])))
     return leagues
@@ -59,7 +60,7 @@ def get_league_matches(league):
     cursor = connection.cursor()
 
     #Create the table in the database
-    get_query = f"SELECT date, hometeam, awayteam FROM match_prediction WHERE league = '{league}'"
+    get_query = f"SELECT date, hometeam, awayteam, cond_check FROM rules_check WHERE league = '{league}'"
     cursor.execute(get_query)
 
     rows = cursor.fetchall()
@@ -68,12 +69,13 @@ def get_league_matches(league):
     connection.close()
 
     #Converting the data extracted to a DataFrame for analysis
-    df = pd.DataFrame(rows, columns=['date','hometeam','awayteam'])
+    df = pd.DataFrame(rows, columns=['date','hometeam','awayteam','cond_check'])
     df['date'] = pd.to_datetime(df['date'], format="%Y-%m-%d %H:%M:%S")
 
     yesterday = date.today() + timedelta(days=-1)
     today = date.today()
     tomorrow = date.today() + timedelta(days=1)
+    df = df[df['cond_check'] == 'True']
     today_df = df[(df['date'].dt.date == yesterday) | (df['date'].dt.date == today) | (df['date'].dt.date == tomorrow)]
     
     matches = []
@@ -101,7 +103,7 @@ def get_predictions(league, date, home_team, away_team):
     cursor = connection.cursor()
 
     #Create the table in the database
-    get_query = f"SELECT hometeam, awayteam, league, home_score_patterns, away_score_patterns, h2h_score_patterns, innerdetail_analysis FROM match_prediction WHERE league = '{league}' AND date = '{date}' AND hometeam = '{home_team}' AND awayteam = '{away_team}'"
+    get_query = f"SELECT hometeam, awayteam, league, home_score_patterns, away_score_patterns, h2h_score_patterns, innerdetail_analysis, home_not_lose, away_not_lose, atleast_one_home, atleast_one_away, twoormoregoals_total, lessthan4goals_total, bothteams_score, bothteams_notscore, cond_check FROM rules_check WHERE league = '{league}' AND date = '{date}' AND hometeam = '{home_team}' AND awayteam = '{away_team}'"
     cursor.execute(get_query)
 
     rows = cursor.fetchall()
@@ -110,7 +112,7 @@ def get_predictions(league, date, home_team, away_team):
     connection.close()
 
     #Converting the data extracted to a DataFrame for analysis
-    df = pd.DataFrame(rows, columns=['hometeam', 'awayteam', 'league', 'home_score_patterns', 'away_score_patterns', 'h2h_score_patterns', 'innerdetail_analysis'])
+    df = pd.DataFrame(rows, columns=['hometeam', 'awayteam', 'league', 'home_score_patterns', 'away_score_patterns', 'h2h_score_patterns', 'innerdetail_analysis', 'home_not_lose', 'away_not_lose', 'atleast_one_home', 'atleast_one_away', 'twoormoregoals_total', 'lessthan4goals_total', 'bothteams_score', 'bothteams_notscore', 'cond_check'])
     return df
 
 
@@ -193,6 +195,19 @@ def view_pred(league, selected_option):
 
     data = {'Category': list(scores_dict.keys()),
             'Value': [len(scores_dict[key]) for key in list(scores_dict.keys())]}
+    
+    rules_checked = {'home_not_lose':["Home team doesn't lose"], 
+                     'away_not_lose':["Away team doesn't lose"], 
+                     'atleast_one_home':["Home team scores at least one goal"], 
+                     'atleast_one_away':["Away team scores at least one goal"], 
+                     'twoormoregoals_total':["Both teams score a sum of two or more goals"], 
+                     'lessthan4goals_total':["Both teams score a sum of less than four goals"], 
+                     'bothteams_score':["Both teams score at least one goal each"], 
+                     'bothteams_notscore':["Both teams each do not score any goal"]}
+    
+    for key in list(rules_checked.keys()):
+        item = list(prediction[key])[0]
+        rules_checked[key].append(item)
 
     # Create a DataFrame from the data
     plot_df = pd.DataFrame(data)
@@ -201,6 +216,13 @@ def view_pred(league, selected_option):
         st.write('--'*20)
         # Display the data as a bar chart
         st.bar_chart(plot_df.set_index('Category')['Value'])
+
+    with st.expander(f"Rules Check"):
+        st.write('--'*20)
+        # Display the data as a bar chart
+        for key in list(rules_checked.keys()):
+            rule_outcome = f"{rules_checked[key][0]}: {rules_checked[key][1]}"
+            st.write(f'<span style="color: white;">{rule_outcome}</span>', unsafe_allow_html=True)
 
     for key in list(scores_dict.keys()):
         with st.expander(f"Prediction: {key}"):
