@@ -43,6 +43,64 @@ def get_leagues():
     return leagues
 
 
+def get_toprulescheck():
+    '''This function gets a list of all the leagues with "interesting" predictions'''
+
+    #PostgreSQL database connection parameters
+    connection_params = {
+        "host": settings.database_hostname,
+        "port": settings.database_port,
+        "database": settings.database_name,
+        "user": settings.database_user,
+        "password": settings.database_password
+    }
+
+    #Connect to PostgreSQL
+    connection = psycopg2.connect(**connection_params)
+    cursor = connection.cursor()
+
+    #Create the table in the database
+    get_query = f"SELECT * FROM rules_check"
+    cursor.execute(get_query)
+
+    rows = cursor.fetchall()
+    column_names = [desc[0] for desc in cursor.description]
+    #Commit and close connection
+    cursor.close()
+    connection.close()
+
+    #Converting the data extracted to a DataFrame for analysis
+    df = pd.DataFrame(rows, columns=column_names)
+    df['date'] = pd.to_datetime(df['date'], format="%Y-%m-%d %H:%M:%S")
+
+    #Filters by date and by only matches with at least one true condition
+    yesterday = date.today() + timedelta(days=-1)
+    today = date.today()
+    tomorrow = date.today() + timedelta(days=1)
+    df = df[df['cond_check'] == 'True']
+    today_df = df[(df['date'].dt.date == yesterday) | (df['date'].dt.date == today) | (df['date'].dt.date == tomorrow)]
+    today_df = today_df[today_df['cond_check'] == 'True']
+    
+    #Counts the number of true conditions per match
+    num_of_trues = []
+    for i in range(today_df.shape[0]):
+        trues_list = today_df.iloc[i,:]
+        trues_list = trues_list[16:-2]
+        trues_list = [item for item in trues_list if item == 'True']
+        num_of_trues.append(len(trues_list))
+        
+    #Orders the dataframe of matches matche with most true conditions
+    today_df['num_of_trues'] = num_of_trues
+    today_df = today_df.sort_values(by='num_of_trues', ascending=False)
+    today_df = today_df.head(5)
+    
+    #Appends the top 5 matches (after ordering matches by descending order) to list for display
+    list_of_top_match = []
+    for i in range(today_df.shape[0]):
+        list_of_top_match.append(f"{today_df.iloc[i,6]} | {today_df.iloc[i,0]} | {today_df.iloc[i,1]} - {today_df.iloc[i,2]}")
+    return list_of_top_match
+
+
 def get_league_matches(league):
     '''This function gets a list of all the matches from all the leagues'''
 

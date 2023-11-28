@@ -1,7 +1,7 @@
 import pandas as pd
 import streamlit as st
 from streamlit_extras.add_vertical_space import add_vertical_space
-from utilities import get_leagues, get_league_matches, view_pred, form, set_stage
+from utilities import get_leagues, get_league_matches, view_pred, form, set_stage, get_toprulescheck
  
 # Sets a wider page layout for visualisation
 st.set_page_config(layout="wide") 
@@ -9,6 +9,8 @@ st.set_page_config(layout="wide")
 # Sets up the available Leagues with prediction for the Sidebar display
 markdown_string = '''Available Leagues with Prediction'''
 leagues = get_leagues()
+
+toprulecheck_matches = get_toprulescheck()
 
 # for league_name in leagues:
 #     markdown_string = markdown_string + f"\n- {league_name}"
@@ -34,6 +36,11 @@ with st.sidebar:
     for league_title in leagues:
         league_url = str(league_title).replace(' ','_')
         exec(f"st.sidebar.markdown('[{league_title}](#_{league_url})')")
+
+    add_vertical_space(2)
+
+    for match_setup in toprulecheck_matches:
+        st.markdown(match_setup)
 
     add_vertical_space(3) 
 
