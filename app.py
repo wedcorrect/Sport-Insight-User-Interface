@@ -39,6 +39,7 @@ with st.sidebar:
 
     add_vertical_space(2)
 
+    st.markdown('''Top 5 matches for the Rules Check.''')
     for match_setup in toprulecheck_matches:
         st.markdown(match_setup)
 
