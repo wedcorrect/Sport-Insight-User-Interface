@@ -255,7 +255,8 @@ def view_pred(league, selected_option):
             'Value': [len(scores_dict[key]) for key in list(scores_dict.keys())]}
     
     rules_checked = {'home_not_lose':["Home team doesn't lose"], 
-                     'away_not_lose':["Away team doesn't lose"], 
+                     'away_not_lose':["Away team doesn't lose"],
+                     'home_and_away_not_draw':["Home and Away team don't draw"], 
                      'atleast_one_home':["Home team scores at least one goal"], 
                      'atleast_one_away':["Away team scores at least one goal"], 
                      'twoormoregoals_total':["Both teams score a sum of two or more goals"], 
