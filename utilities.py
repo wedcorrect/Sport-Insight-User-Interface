@@ -85,7 +85,7 @@ def get_toprulescheck():
     num_of_trues = []
     for i in range(today_df.shape[0]):
         trues_list = today_df.iloc[i,:]
-        trues_list = trues_list[16:-2]
+        trues_list = trues_list[16:-1]
         trues_list = [item for item in trues_list if item == 'True']
         num_of_trues.append(len(trues_list))
         
