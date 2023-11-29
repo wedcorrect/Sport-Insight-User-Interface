@@ -161,7 +161,7 @@ def get_predictions(league, date, home_team, away_team):
     cursor = connection.cursor()
 
     #Create the table in the database
-    get_query = f"SELECT hometeam, awayteam, league, home_score_patterns, away_score_patterns, h2h_score_patterns, innerdetail_analysis, home_not_lose, away_not_lose, atleast_one_home, atleast_one_away, twoormoregoals_total, lessthan4goals_total, bothteams_score, bothteams_notscore, cond_check FROM rules_check WHERE league = '{league}' AND date = '{date}' AND hometeam = '{home_team}' AND awayteam = '{away_team}'"
+    get_query = f"SELECT hometeam, awayteam, league, home_score_patterns, away_score_patterns, h2h_score_patterns, innerdetail_analysis, home_not_lose, away_not_lose, home_and_away_not_draw, atleast_one_home, atleast_one_away, twoormoregoals_total, lessthan4goals_total, bothteams_score, bothteams_notscore, cond_check FROM rules_check WHERE league = '{league}' AND date = '{date}' AND hometeam = '{home_team}' AND awayteam = '{away_team}'"
     cursor.execute(get_query)
 
     rows = cursor.fetchall()
@@ -170,7 +170,7 @@ def get_predictions(league, date, home_team, away_team):
     connection.close()
 
     #Converting the data extracted to a DataFrame for analysis
-    df = pd.DataFrame(rows, columns=['hometeam', 'awayteam', 'league', 'home_score_patterns', 'away_score_patterns', 'h2h_score_patterns', 'innerdetail_analysis', 'home_not_lose', 'away_not_lose', 'atleast_one_home', 'atleast_one_away', 'twoormoregoals_total', 'lessthan4goals_total', 'bothteams_score', 'bothteams_notscore', 'cond_check'])
+    df = pd.DataFrame(rows, columns=['hometeam', 'awayteam', 'league', 'home_score_patterns', 'away_score_patterns', 'h2h_score_patterns', 'innerdetail_analysis', 'home_not_lose', 'away_not_lose', 'home_and_away_not_draw', 'atleast_one_home', 'atleast_one_away', 'twoormoregoals_total', 'lessthan4goals_total', 'bothteams_score', 'bothteams_notscore', 'cond_check'])
     return df
 
 
