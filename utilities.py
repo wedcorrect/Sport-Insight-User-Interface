@@ -3,6 +3,7 @@ import psycopg2
 from config import settings
 import streamlit as st
 from datetime import date, timedelta
+from variables import *
 
 
 def get_leagues():
@@ -320,6 +321,11 @@ def form(leagues_matches, league):
 
         #Submit the selected option
         submitted = st.form_submit_button("Submit", on_click=set_stage, args=(1,))
+
+        st.write(f"System accuracy on {league} based on historical records: {leagues_records[league][2]}")
+        st.write(f"Most accurate prediction sources on {league} based on historical records:")
+        st.write(f"1st source: {leagues_records[league][0]}")
+        st.write(f"2nd source: {leagues_records[league][1]}")
 
     if submitted:
         view_pred(league, selected_option)
