@@ -322,10 +322,16 @@ def form(leagues_matches, league):
         #Submit the selected option
         submitted = st.form_submit_button("Submit", on_click=set_stage, args=(1,))
 
-        st.write(f"System accuracy on {league} based on historical records: {leagues_records[league][2]}")
-        st.write(f"Most accurate prediction sources on {league} based on historical records:")
-        st.write(f"1st source: {leagues_records[league][0]}")
-        st.write(f"2nd source: {leagues_records[league][1]}")
+        # Text to display
+        accuracy = f"System accuracy on {league}: {leagues_records[league][2]}"
+        first_source = f"1st most accurate prediction sources on {league}: {leagues_records[league][0]}"
+        second_source = f"2nd most accurate prediction sources on {league}: {leagues_records[league][1]}"
+
+        # Use st.markdown to apply HTML-style formatting
+        st.markdown(f'<span style="font-size: 14pt;">Historical Record</span>', unsafe_allow_html=True)
+        st.markdown(f'<span style="font-size: 12pt;">{accuracy}</span>', unsafe_allow_html=True)
+        st.markdown(f'<span style="font-size: 12pt;">{first_source}</span>', unsafe_allow_html=True)
+        st.markdown(f'<span style="font-size: 12pt;">{second_source}</span>', unsafe_allow_html=True)
 
     if submitted:
         view_pred(league, selected_option)
