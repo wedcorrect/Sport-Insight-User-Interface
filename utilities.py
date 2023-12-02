@@ -324,14 +324,14 @@ def form(leagues_matches, league):
 
         # Text to display
         accuracy = f"System accuracy on {league}: {leagues_records[league][2]}"
-        first_source = f"1st most accurate prediction sources on {league}: {leagues_records[league][0]}"
-        second_source = f"2nd most accurate prediction sources on {league}: {leagues_records[league][1]}"
+        first_source = f"1st most accurate prediction source: {leagues_records[league][0]}"
+        second_source = f"2nd most accurate prediction source: {leagues_records[league][1]}"
 
         # Use st.markdown to apply HTML-style formatting
-        st.markdown(f'<span style="font-size: 14pt;">Historical Record</span>', unsafe_allow_html=True)
-        st.markdown(f'<span style="font-size: 12pt;">{accuracy}</span>', unsafe_allow_html=True)
-        st.markdown(f'<span style="font-size: 12pt;">{first_source}</span>', unsafe_allow_html=True)
-        st.markdown(f'<span style="font-size: 12pt;">{second_source}</span>', unsafe_allow_html=True)
+        st.markdown(f'<span style="font-size: 11pt;">Historical Record</span>', unsafe_allow_html=True)
+        st.markdown(f'<span style="font-size: 9pt;">{accuracy}</span>', unsafe_allow_html=True)
+        st.markdown(f'<span style="font-size: 9pt;">{first_source}</span>', unsafe_allow_html=True)
+        st.markdown(f'<span style="font-size: 9pt;">{second_source}</span>', unsafe_allow_html=True)
 
     if submitted:
         view_pred(league, selected_option)
